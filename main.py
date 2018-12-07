@@ -193,9 +193,12 @@ class Game:
                 plat.rect.x -= max(abs(self.player.vel.x), 2)
                 if plat.rect.right <= WIDTH - 800:
                     plat.kill()
-            brokenplatformhits = pg.sprite.spritecollide(self.player, self.brokenplatforms, False)
-            if brokenplatformhits:
-                plat.kill()
+
+        # brokenplatformhits = pg.sprite.spritecollide(self.player, self.brokenplatforms, False)
+        # for plat in self.brokenplatforms:
+        #     if brokenplatformhits:
+        #         plat.kill()
+                
         '''if player gets a coin'''
         gold_hits = pg.sprite.spritecollide(self.player, self.gold, True)
         for gold in gold_hits:
@@ -332,6 +335,13 @@ class Game:
         self.draw_text("Press any key to play...", 22, WHITE, WIDTH / 2, HEIGHT * 3/4)
         self.draw_text("High Score " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT/2 + 100)
         self.draw_text("Press ESCAPE to restart ", 22, WHITE, WIDTH / 2, 330)
+        if self.score > self.highscore:
+            self.highscore = self.score
+            self.draw_text("New High Score!", 22, REDDISH, WIDTH / 2, HEIGHT/2 + 70)
+            with open(path.join(self.dir, HS_FILE), 'w') as f:
+                f.write(str(self.score))
+        else:
+            self.draw_text("High Score " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT/2 + 100)
 
         pg.display.flip()
         self.wait_for_key()
