@@ -193,12 +193,9 @@ class Game:
                 plat.rect.x -= max(abs(self.player.vel.x), 2)
                 if plat.rect.right <= WIDTH - 800:
                     plat.kill()
-
-        # brokenplatformhits = pg.sprite.spritecollide(self.player, self.brokenplatforms, False)
-        # for plat in self.brokenplatforms:
-        #     if brokenplatformhits:
-        #         plat.kill()
-                
+            brokenplatformhits = pg.sprite.spritecollide(self.player, self.brokenplatforms, False)
+            if brokenplatformhits:
+                plat.kill()
         '''if player gets a coin'''
         gold_hits = pg.sprite.spritecollide(self.player, self.gold, True)
         for gold in gold_hits:
