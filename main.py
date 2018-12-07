@@ -172,7 +172,7 @@ class Game:
                 bronze.rect.x -= max(abs(self.player.vel.x), 2)
             for carrot in self.carrot:
                 carrot.rect.x -= max(abs(self.player.vel.x), 2)
-            '''spikes scroll with the screen instead of staying in the same spot'''
+            '''spikes and springs scroll with the screen instead of staying in the same spot'''
             for spike in self.spikes:
                 spike.rect.x -= max(abs(self.player.vel.x), 2)
             for spring in self.springs:
@@ -193,6 +193,7 @@ class Game:
                 plat.rect.x -= max(abs(self.player.vel.x), 2)
                 if plat.rect.right <= WIDTH - 800:
                     plat.kill()
+            '''when you hit a broken platform it breaks'''
             brokenplatformhits = pg.sprite.spritecollide(self.player, self.brokenplatforms, False)
             if brokenplatformhits:
                 plat.kill()
@@ -218,6 +219,7 @@ class Game:
                 self.player.vel.y = -10
                 self.player.jumping = False
                 self.score += 1
+        '''when you get the golden carrot it displays a screen saying you won'''
         carrot_hits = pg.sprite.spritecollide(self.player, self.carrot, True)
         for carrot in carrot_hits:
             if carrot.type == 'carrot':

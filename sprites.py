@@ -166,6 +166,7 @@ class Platform(Sprite):
         if random.randrange(100) < CARROT_SPAWN_PCT:
             Carrot(self.game, self)
 
+''' class for a broken platform tht breaks when you land on it'''
 class BrokenPlatform(Sprite):
     def __init__(self, game, x, y):
         # allows layering in LayeredUpdates sprite group
@@ -195,6 +196,7 @@ class BrokenPlatform(Sprite):
         if random.randrange(100) < CARROT_SPAWN_PCT:
             Carrot(self.game, self)
 
+'''3 coin classes that give you different amount of points when you get them'''
 class Gold(Sprite):
     def __init__(self, game, plat):
         # allows layering in LayeredUpdates sprite group
@@ -368,6 +370,7 @@ class FlyMob2(Sprite):
         # if self.rect.left > WIDTH + 100 or self.rect.right < -100:
         #     self.kill()
 
+'''a spike that when you hit it you die'''
 class Spike(Sprite):
     def __init__(self, game, plat):
         # allows layering in LayeredUpdates sprite group
@@ -389,6 +392,7 @@ class Spike(Sprite):
         if not self.game.platforms.has(self.plat):
             self.kill()
 
+'''a spring that when you hit it you jump higher'''
 class Spring(Sprite):
     def __init__(self, game, plat):
         # allows layering in LayeredUpdates sprite group

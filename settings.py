@@ -35,14 +35,6 @@ MOB_LAYER = 2
 BACK_LAYER = 3
 
 # platform settings
-''' old platforms from drawing rectangles'''
-'''
-PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH, 40),
-                 (65, HEIGHT - 300, WIDTH-400, 40),
-                 (20, HEIGHT - 350, WIDTH-300, 40),
-                 (200, HEIGHT - 150, WIDTH-350, 40),
-                 (200, HEIGHT - 450, WIDTH-350, 40)]
-'''
 PLATFORM_LIST = [(0, HEIGHT - 40),
                  (65, HEIGHT - 300),
                  (20, HEIGHT - 350),
