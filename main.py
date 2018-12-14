@@ -1,6 +1,5 @@
-# this file was created by Chris Cozort
-# Sources: goo.gl/2KMivS 
-# now available in github
+# this file was created by Dominick Kirk
+# Sources: Mr. Cozort, Kids Can Code
 
 '''  
 Curious, Creative, Tenacious(requires hopefulness)
