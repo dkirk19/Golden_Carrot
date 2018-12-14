@@ -2,11 +2,27 @@
 # Sources: goo.gl/2KMivS 
 # now available in github
 
-'''
+'''  
 Curious, Creative, Tenacious(requires hopefulness)
 
-Game ideas:
-Walls closing in on player
+Gameplay changes:
+- Side scrolling
+- different tier coins that award different points rarity of spawning
+- additional flying enemy
+- springs that boost you upwards
+- spikes on the top and bottom of platforms that kill you when you hit them
+- Broken Platforms that break when you hit them
+- Objective of the game is to find the golden carrot which is rare and adds 20 points to your score
+- Added a restart button in case game doesn't end as its supposed to
+- Added a "secret" button that displays a secret screen
+
+Bugs:
+- Broken Platforms don't break when you hit them they just have no collision
+- There is no platform at the beginning so you sometimes just die right as you start
+- After the win screen is shown it doesnt restart the game
+
+Unintentional Additions:
+- Platforms usually don't generate until you get close to them so it adds a level of difficulty
 
 '''
 import pygame as pg
@@ -67,9 +83,11 @@ class Game:
         self.gold = pg.sprite.Group()
         self.silver = pg.sprite.Group()
         self.bronze = pg.sprite.Group()
+        '''add carrot'''
         self.carrot = pg.sprite.Group()
-        '''add spikes'''
+        '''add spikes and springs'''
         self.spikes = pg.sprite.Group()
+        self.bottomspikes = pg.sprite.Group()
         self.springs = pg.sprite.Group()
         self.flymob1_timer = 0
         self.flymob2_timer = 0
@@ -128,7 +146,7 @@ class Game:
         if now - self.flymob2_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
             self.flymob2_timer = now
             FlyMob2(self)
-        # check for mob collisions
+        '''added second mob collision detection'''
         flymob2_hits = pg.sprite.spritecollide(self.player, self.flymobs2, False)
         if flymob2_hits:
             if self.player.pos.y - 35 < flymob2_hits[0].rect_top:
@@ -161,7 +179,6 @@ class Game:
                 # scroll plats with player
         ''' changed values and variables so instead of scrolling upwards it scrolls to the right'''
         if self.player.rect.right >= WIDTH / 1.5:
-            # creates slight scroll at the top based on player y velocity
             self.player.pos.x -= max(abs(self.player.vel.x), 2)
             '''coins scroll with the screen instead of staying in the same spot'''
             for gold in self.gold:
@@ -170,11 +187,14 @@ class Game:
                 silver.rect.x -= max(abs(self.player.vel.x), 2)
             for bronze in self.bronze:
                 bronze.rect.x -= max(abs(self.player.vel.x), 2)
+            ''' carrot scrolls with platforms'''
             for carrot in self.carrot:
                 carrot.rect.x -= max(abs(self.player.vel.x), 2)
             '''spikes and springs scroll with the screen instead of staying in the same spot'''
             for spike in self.spikes:
                 spike.rect.x -= max(abs(self.player.vel.x), 2)
+            for bottomspike in self.bottomspikes:
+                bottomspike.rect.x -= max(abs(self.player.vel.x), 2)
             for spring in self.springs:
                 spring.rect.x -= max(abs(self.player.vel.x), 2)
             '''mobs scroll with the screen'''
@@ -184,8 +204,8 @@ class Game:
             for flymob2 in self.flymobs2:
                 flymob2.rect.x -= max(abs(self.player.vel.x), 2)
             
+            '''changed it so platforms disappear as the screen scrolls past them'''
             for plat in self.platforms:
-                '''changed it so platforms disappear as the screen scrolls past them'''
                 plat.rect.x -= max(abs(self.player.vel.x), 2)
                 if plat.rect.right <= WIDTH - 800:
                     plat.kill()
@@ -193,7 +213,8 @@ class Game:
                 plat.rect.x -= max(abs(self.player.vel.x), 2)
                 if plat.rect.right <= WIDTH - 800:
                     plat.kill()
-            '''when you hit a broken platform it breaks'''
+            '''when you hit a broken platform it breaks
+                This doesn't work'''
             brokenplatformhits = pg.sprite.spritecollide(self.player, self.brokenplatforms, False)
             if brokenplatformhits:
                 plat.kill()
@@ -226,13 +247,14 @@ class Game:
                 self.boost_sound.play()
                 self.player.vel.y = -10
                 self.player.jumping = False
+                self.score += 20
                 '''win screen'''
                 self.screen.fill(BLACK)
                 self.draw_text("You Won!", 48, GOLD, WIDTH/2, HEIGHT/4)
                 self.draw_text("WASD to move", 22, SKY_BLUE, WIDTH/2, HEIGHT/2)
                 self.draw_text("Press any key to play...", 22, WHITE, WIDTH / 2, HEIGHT * 3/4)
                 self.draw_text("High Score " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT/2 + 100)
-                self.draw_text("Press ESCAPE to restart ", 22, WHITE, WIDTH / 2, 330)
+                self.draw_text("Press ESCAPE to restart ", 22, SKY_BLUE, WIDTH / 2, 330)
                 if self.score > self.highscore:
                     self.highscore = self.score
                     self.draw_text("New High Score!", 22, REDDISH, WIDTH / 2, HEIGHT/2 + 70)
@@ -243,17 +265,21 @@ class Game:
 
             pg.display.flip()
             self.wait_for_key()
-        '''if player hits a spring'''
+        '''if player hits a spring it uses boost power'''
         spring_hits = pg.sprite.spritecollide(self.player, self.springs, True)
         for spring in spring_hits:
             if spring.type == 'spring':
                 self.boost_sound.play()
                 self.player.vel.y = -BOOST_POWER
                 self.player.jumping = False
-        ''' if player hits spikes'''
+        ''' if player hits spikes you die'''
         spike_hits = pg.sprite.spritecollide(self.player, self.spikes, True)
         for spike in spike_hits:
             if spike.type == 'spike':
+                self.playing = False
+        bottomspike_hits = pg.sprite.spritecollide(self.player, self.bottomspikes, True)
+        for bottomspike in bottomspike_hits:
+            if bottomspike.type == 'bottomspike':
                 self.playing = False
 
         # Die!
@@ -263,6 +289,7 @@ class Game:
             if sprite.rect.bottom < 0:
                     sprite.kill()
 
+        '''reset button'''
         keys = pg.key.get_pressed()
         if keys[pg.K_ESCAPE]:
             self.playing = False
@@ -273,7 +300,8 @@ class Game:
         if len(self.brokenplatforms) == 0:
             self.playing = False
 
-        '''platform generator'''
+        '''platform generator
+            changed numbers so platforms spawn more horizontally rather than vertical'''
         while len(self.platforms) < 15:
             Platform(self, random.randrange(100, 1000), 
                             random.randrange(-1, 1000))
@@ -281,6 +309,16 @@ class Game:
             BrokenPlatform(self, random.randrange(100, 1000), 
                             random.randrange(-1, 1000))
 
+        '''secret screen'''
+        keys = pg.key.get_pressed()
+        if keys[pg.K_z]:
+             self.screen.fill(BLACK)
+             self.draw_text("Congrats you found the Secret Screen!", 48, GOLD, WIDTH/2, HEIGHT/4)
+             self.draw_text("Here are some words of wisdom:", 36, GOLD, WIDTH/2, HEIGHT/4 + 100)
+             self.draw_text("A trebuchet (French trébuchet) is a type of catapult, a common type of siege engine which uses a swinging arm to throw a projectile.", 18, WHITE, WIDTH/2, HEIGHT/4 + 180)
+             self.draw_text("The traction trebuchet, also referred to as a mangonel at times, first appeared in Ancient China during the 4th century BC as a siege weapon.", 18, WHITE, WIDTH/2, HEIGHT/4 + 200)
+             pg.display.flip()
+             self.wait_for_key()
 
     def events(self):
         for event in pg.event.get():
@@ -320,7 +358,7 @@ class Game:
         self.draw_text("WASD to move", 22, SKY_BLUE, WIDTH/2, HEIGHT/2)
         self.draw_text("Press any key to play...", 22, WHITE, WIDTH / 2, HEIGHT * 3/4)
         self.draw_text("High score " + str(self.highscore), 22, WHITE, WIDTH / 2, 15)
-        self.draw_text("Press ESCAPE to restart ", 22, WHITE, WIDTH / 2, 330)
+        self.draw_text("Press ESCAPE to restart ", 22, SKY_BLUE, WIDTH / 2, 330)
         pg.display.flip()
         self.wait_for_key()
     def show_go_screen(self):
@@ -333,7 +371,7 @@ class Game:
         self.draw_text("WASD to move", 22, SKY_BLUE, WIDTH/2, HEIGHT/2)
         self.draw_text("Press any key to play...", 22, WHITE, WIDTH / 2, HEIGHT * 3/4)
         self.draw_text("High Score " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT/2 + 100)
-        self.draw_text("Press ESCAPE to restart ", 22, WHITE, WIDTH / 2, 330)
+        self.draw_text("Press ESCAPE to restart ", 22, SKY_BLUE, WIDTH / 2, 330)
         if self.score > self.highscore:
             self.highscore = self.score
             self.draw_text("New High Score!", 22, REDDISH, WIDTH / 2, HEIGHT/2 + 70)
@@ -344,6 +382,7 @@ class Game:
 
         pg.display.flip()
         self.wait_for_key()
+
     def draw_text(self, text, size, color, x, y):
         font = pg.font.Font(self.font_name, size)
         text_surface = font.render(text, True, color)

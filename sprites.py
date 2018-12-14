@@ -153,6 +153,7 @@ class Platform(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        '''these lines spawn each coin, spring, spike, or carrot on top of platforms with each corresponding spawn percentage'''
         if random.randrange(100) < GOLD_SPAWN_PCT:
             Gold(self.game, self)
         if random.randrange(100) < SILVER_SPAWN_PCT:
@@ -161,6 +162,8 @@ class Platform(Sprite):
             Bronze(self.game, self)
         if random.randrange(100) < BRONZE_SPAWN_PCT:
             Spike(self.game, self)
+        if random.randrange(100) < BRONZE_SPAWN_PCT:
+            BottomSpike(self.game, self)
         if random.randrange(100) < SILVER_SPAWN_PCT:
             Spring(self.game, self)
         if random.randrange(100) < CARROT_SPAWN_PCT:
@@ -269,6 +272,7 @@ class Bronze(Sprite):
         if not self.game.platforms.has(self.plat):
             self.kill()
 
+'''class for the golden carrot which is the win objective'''
 class Carrot(Sprite):
     def __init__(self, game, plat):
         # allows layering in LayeredUpdates sprite group
@@ -330,6 +334,7 @@ class FlyMob1(Sprite):
         # if self.rect.left > WIDTH + 100 or self.rect.right < -100:
         #     self.kill()
 
+'''second flying mob class'''
 class FlyMob2(Sprite):
     def __init__(self, game):
         # allows layering in LayeredUpdates sprite group
@@ -388,6 +393,28 @@ class Spike(Sprite):
         self.rect.bottom = self.plat.rect.top
     def update(self):
         self.rect.bottom = self.plat.rect.top
+        # checks to see if plat is in the game's platforms group so we can kill the powerup instance
+        if not self.game.platforms.has(self.plat):
+            self.kill()
+
+'''a spike that when you hit it you die'''
+class BottomSpike(Sprite):
+    def __init__(self, game, plat):
+        # allows layering in LayeredUpdates sprite group
+        self._layer = MOB_LAYER
+        # add a groups property where we can pass all instances of this object into game groups
+        self.groups = game.all_sprites, game.bottomspikes
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.plat = plat
+        self.type = random.choice(['bottomspike'])
+        self.image = self.game.spritesheet.get_image(147, 1988, 95, 53)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.plat.rect.centerx
+        self.rect.top = self.plat.rect.bottom
+    def update(self):
+        self.rect.top = self.plat.rect.bottom
         # checks to see if plat is in the game's platforms group so we can kill the powerup instance
         if not self.game.platforms.has(self.plat):
             self.kill()

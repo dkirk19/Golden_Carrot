@@ -21,6 +21,7 @@ PLAYER_GRAV = 0.8
 PLAYER_JUMP = 20
 # game settings
 BOOST_POWER = 20
+'''added individual spawn percentage varialbes for each coin and carrots'''
 BRONZE_SPAWN_PCT = 12
 SILVER_SPAWN_PCT = 8
 GOLD_SPAWN_PCT = 4
